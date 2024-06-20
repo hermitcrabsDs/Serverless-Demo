@@ -1,3 +1,131 @@
+const hubspot = require('@hubspot/api-client');
+const axios = require("axios");
+const ENROLLMENT_ACCESS_TOKEN = process.env.ENROLLMENT_ACCESS_TOKEN;
+
+
+const objectType = "2-13487747";
+//const toContactObjectType = "0-1";
+//const associationType = "21";
+
+exports.main = async function (req, res) {
+   const hubspotClient = new hubspot.Client({"accessToken":"ENROLLMENT_ACCESS_TOKEN"});
+//    console.log(req)
+   let recordId = req.body.recordId;;
+   let course_progress = req.body.course_progress;
+   let total_lessons = req.body.total_lessons;
+   let lessons_id = req.body.lessons_id;
+   let course_name = req.body.course_name;
+   let user_name = req.body.user_name;
+   let findCourseProgressObj = await getExistingCourseProgressObj(recordId);
+
+   let properties;
+   //* Updating coures progress Object
+   if (findCourseProgressObj.total === 1) {
+      console.log("findCourseProgressObj:", findCourseProgressObj.total);
+      const properties = {
+         course_progress,
+         total_lessons,
+         lessons_id,
+         course_name,
+         user_name
+      };
+      const SimplePublicObjectInput = { properties };
+      let objectId = findCourseProgressObj.results[0].id;
+      const idProperty = undefined;
+
+      var config = {
+         method: 'PATCH',
+         url: `https://api.hubapi.com/crm/v3/objects/${objectType}/${objectId}`,
+         headers: {
+            'Authorization': `Bearer ${ENROLLMENT_ACCESS_TOKEN}`,
+            'Content-Type': 'application/json'
+         },
+         data: SimplePublicObjectInput
+      };
+      
+      
+      try {
+         console.log("SimplePublicObjectInput", SimplePublicObjectInput );
+         console.log("before objectId", objectId );
+         let apiResponse = await axios(config);
+        
+         console.log(JSON.stringify(apiResponse.data));
+         res({ body: { response: apiResponse.data }, statusCode: 200 });
+         
+//          res.send({ "result": "Course Progress Updated Successfully" });
+//          res({ body: apiResponse.data , statusCode: 200 });
+         
+      } catch (e) {
+         console.error("error 56 ", e.message);
+      }
+   } else if (findCourseProgressObj.total === 0) {
+      // console.log("No record found ", findCourseProgressObj.total);
+       res({ body: "No record found " , statusCode: 200 });
+   } else {
+      // console.log("More than one object found with same data", findCourseProgressObj.total);
+   }
+};
+
+
+async function getExistingCourseProgressObj(recordId) {
+   // console.log("recordId:", recordId);
+
+   let result = [];
+   var data = JSON.stringify({
+      "filterGroups": [
+         {
+            "filters": [
+               {
+                  "value": parseInt(recordId),
+                  "propertyName": "hs_object_id",
+                  "operator": "EQ"
+               }
+            ]
+         }
+      ],
+      "properties": [
+         "course_progress",
+         "lessons_id",
+         "total_lessons"
+      ],
+      "limit": 10,
+      "after": 0
+   });
+
+   var config = {
+      method: 'post',
+      url: `https://api.hubapi.com/crm/v3/objects/${objectType}/search`,
+      headers: {
+         'Authorization': `Bearer ${ENROLLMENT_ACCESS_TOKEN}`,
+         'Content-Type': 'application/json'
+      },
+      data: data
+   };
+   try {
+      let apiResponse = await axios(config);
+      result = await apiResponse.data;
+//       console.log("result:", result);
+      // // console.log("Number of result found :", result.total);
+      if (result.total === 1) {
+         return result;
+      }
+   } catch (error) {
+      // // console.log("error ", error);
+   }
+
+   return result;
+
+}
+
+
+
+
+
+
+
+
+
+
 const axios = require('axios');
 const ENROLLMENT_ACCESS_TOKEN = process.env.ENROLLMENT_ACCESS_TOKEN;
 const FormData = require('form-data');
