@@ -20,6 +20,12 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          
+      - name: Debug Path
+        run: echo $PATH
+
+      - name: Verify SonarQube Scanner Installation
+        run: sonar-scanner -v
 
       - name: Install SonarQube Scanner
         run: |
