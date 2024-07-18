@@ -22,8 +22,9 @@ jobs:
           distribution: 'temurin' # or 'adopt', 'zulu', etc.
 
       - name: SonarQube Scan
-        uses: SonarSource/sonarcloud-github-action@v1
+        uses: SonarSource/sonarqube-scan-action@v1.0.1
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_HOST_URL }}
         with:
-          projectBaseDir: '.'
+          args: '-X'
