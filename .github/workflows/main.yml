@@ -19,10 +19,10 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
-          distribution: 'adopt' # or 'zulu', 'temurin', etc.
+          distribution: 'temurin' # or 'adopt', 'zulu', etc.
 
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@v1.0.0
-        with:
-          host: ${{ secrets.SONAR_TOKEN  }}
-          login: ${{ secrets.SONAR_HOST_URL  }}
+        env:
+          SONAR_HOST_URL: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_HOST_URL }}
