@@ -3,7 +3,7 @@ const axios = require("axios");
 const ENROLLMENT_ACCESS_TOKEN = process.env.ENROLLMENT_ACCESS_TOKEN;
 
 
-const objectType = "2-13487747";
+const objectType = ;
 //const toContactObjectType = "0-1";
 //const associationType = "21";
 
@@ -15,7 +15,7 @@ exports.main = async function (req, res) {
    let total_lessons = req.body.total_lessons;
    let lessons_id = req.body.lessons_id;
    let course_name = req.body.course_name;
-   let user_name = req.body.user_name;
+   let user_name = 
    let findCourseProgressObj = await getExistingCourseProgressObj(recordId);
 
    let properties;
